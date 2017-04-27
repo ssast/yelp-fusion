@@ -2,4 +2,4 @@
 #
 # by Shaun Astbury
 #
-from api import YelpFusion
+from .api import YelpFusion
