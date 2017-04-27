@@ -5,7 +5,7 @@ import datetime
 import time
 
 # Pacific timezone used for setting the Yelp API quota refresh time.
-zone = pytz.timezone('US/Pacific')
+zone = pytz.timezone('America/Los_Angeles')
 
 
 # Function to query url and convert json to dict.
@@ -28,11 +28,13 @@ def url_query(url, params=None, headers=None, reqtype='get', repeat=0):
         # sleep until then.
         elif request.status_code == 429:
             start = datetime.datetime.now(zone)
-            end = datetime.datetime(start.year, start.month, start.day, tzinfo=zone)
+            end = datetime.datetime(start.year, start.month, start.day, tzinfo=start.tzinfo)
             end += datetime.timedelta(days=1)
             wait = end - start
             seconds = wait.seconds + 60
-            print('Over quota limit, sleeping {0} seconds'.format(seconds))
+            resume = datetime.datetime.now() + datetime.timedelta(seconds=seconds)
+            resume = resume.strftime('%Y-%m-%d %H:%M:%S')
+            print('Over quota limit, sleeping until {0}'.format(resume))
             time.sleep(seconds)
             return url_query(url, params, headers, reqtype, repeat)
         else:
